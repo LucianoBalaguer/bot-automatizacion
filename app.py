@@ -499,5 +499,5 @@ Asistente:
     return str(twilio_response)
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(port=5000, debug=True)
