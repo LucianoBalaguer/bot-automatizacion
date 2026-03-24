@@ -258,7 +258,7 @@ def generar_respuesta_ollama(system_prompt, user_message):
         response = requests.post(
             "http://localhost:11434/api/chat",
             json={
-                "model": "qwen2.5:7b",
+                "model": "phi",
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message}
