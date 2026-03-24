@@ -1,0 +1,7 @@
+flask
+requests
+twilio
+firebase-admin
+gspread
+google-auth
+gunicorn
