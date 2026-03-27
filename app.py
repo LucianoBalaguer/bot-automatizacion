@@ -8,6 +8,8 @@ import gspread
 from google.oauth2.service_account import Credentials
 import difflib
 import re
+from openai import OpenAI
+import os
 
 app = Flask(__name__)
 
@@ -249,35 +251,30 @@ def obtener_auto_actual(phone):
     return None
 
 # ===================================
-# 🤖 FUNCIÓN: Generar respuesta Ollama
+# 🤖 FUNCIÓN: Generar respuesta CHAT GPT
 # ===================================
-def generar_respuesta_ollama(system_prompt, user_message):
+
+client = OpenAI(api_key="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")
+
+def generar_respuesta_ia(system_prompt, user_message):
 
     try:
 
-        response = requests.post(
-            "http://localhost:11434/api/chat",
-            json={
-                "model": "phi",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message}
-                ],
-                "stream": False
-            },
-            timeout=60
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
+            max_tokens=300,
+            temperature=0.7
         )
 
-        response.raise_for_status()
-
-        data = response.json()
-
-        return data["message"]["content"]
+        return response.choices[0].message.content
 
     except Exception as e:
 
-        print("Error con Ollama:", e)
-
+        print("Error con OpenAI:", e)
         return "Hubo un problema generando la respuesta."
     
 # ===================================
@@ -288,28 +285,25 @@ def detectar_intencion(mensaje):
     prompt = f"""
 Clasificá el siguiente mensaje en UNA de estas categorías:
 
-- NUEVO: el usuario inicia una nueva consulta o no refiere a algo previo
-- CONTEXTO: el usuario se refiere a algo ya mencionado antes
+- NUEVO
+- CONTEXTO
 
 Mensaje: "{mensaje}"
 
-Respondé SOLO con una palabra: NUEVO o CONTEXTO
+Respondé SOLO con una palabra.
 """
 
     try:
-        response = requests.post(
-            "http://localhost:11434/api/chat",
-            json={
-                "model": "qwen2.5:7b",
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ],
-                "stream": False
-            },
-            timeout=30
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=5,
+            temperature=0
         )
 
-        return response.json()["message"]["content"].strip().upper()
+        return response.choices[0].message.content.strip().upper()
 
     except:
         return "NUEVO"
@@ -474,7 +468,7 @@ Asistente:
     # ===================================
     # 🤖 Generar respuesta IA
     # ===================================
-    respuesta_ia = generar_respuesta_ollama(prompt_completo, incoming_msg)
+    respuesta_ia = generar_respuesta_ia(prompt_completo, incoming_msg)
 
     # ===================================
     # 💾 Guardar respuesta IA
