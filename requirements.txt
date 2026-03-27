@@ -5,3 +5,4 @@ firebase-admin
 gspread
 google-auth
 gunicorn
+openai
