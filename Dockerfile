@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir flask requests twilio firebase-admin gunicorn
+RUN pip install --no-cache-dir flask requests twilio firebase-admin gunicorn openai gspread google-auth
 
 EXPOSE 80
 
