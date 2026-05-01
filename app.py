@@ -308,6 +308,9 @@ Respondé SOLO con una palabra.
     except:
         return "NUEVO"
 
+@app.route("/", methods=["GET"])
+def health():
+    return "OK", 200
 
 # ===================================
 # 📩 WEBHOOK
